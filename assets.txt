@@ -1,0 +1,6 @@
+Texture Naught ./resources/images/O.png
+Texture NaughtWin ./resources/images/OWin.png
+Texture Tile ./resources/images/Tile.png
+Texture Cross ./resources/images/X.png
+Texture CrossWin ./resources/images/XWin.png
+Font Hack ./resources/fonts/Hack.ttf
