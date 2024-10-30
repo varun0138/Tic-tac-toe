@@ -11,7 +11,7 @@ link:
 	g++ *.o -o main -L $(SFML_LIB) -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 
 
 clean:
-	del *.o
+	del *.o *.exe
 	
 run:
 	./main

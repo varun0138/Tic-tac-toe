@@ -1,13 +1,7 @@
 #include "Board.hpp"
 
-Board::Board(unsigned int size) {
-    setUp(size);
-}
-
-void Board::setUp(unsigned int size) {
-    m_size = size;
-    m_board = std::vector<std::vector<State>>(m_size, std::vector<State>(m_size, EMPTY));
-}
+Board::Board(unsigned int size)
+    : m_size(size), m_board(m_size, std::vector<State>(m_size, EMPTY)) {}
 
 void Board::setState(unsigned int row, unsigned int col, State state) {
     m_board[row][col] = state;
@@ -28,7 +22,7 @@ bool Board::checkDraw() const {
     return true;
 }
 
-State Board::checkWin() const {
+WinInfo Board::checkWin() const {
     // Helper lambda function to check if all elements in a line are the same
     static auto allEqual = [](const std::vector<State>& line) -> State {
         State ref = line[0];
@@ -40,70 +34,48 @@ State Board::checkWin() const {
     };
 
     std::vector<State> line(m_size);
+    std::vector<sf::Vector2u> lineCoords(m_size, sf::Vector2u(0, 0));
 
     // Check rows
     for (unsigned int y = 0; y < m_size; ++y) {
-        for (unsigned int x = 0; x < m_size; ++x) line[x] = m_board[y][x];
+        for (unsigned int x = 0; x < m_size; ++x) {
+            line[x] = m_board[y][x];
+            lineCoords[x] = {y, x};
+        }
         State winner = allEqual(line);
-        if (winner != EMPTY) return winner;
+        if (winner != EMPTY) return {winner, lineCoords};
     }
 
     // Check columns
     for (unsigned int x = 0; x < m_size; ++x) {
-        for (unsigned int y = 0; y < m_size; ++y) line[y] = m_board[y][x];
+        for (unsigned int y = 0; y < m_size; ++y) {
+            line[y] = m_board[y][x];
+            lineCoords[y] = {y, x};
+        }
         State winner = allEqual(line);
-        if (winner != EMPTY) return winner;
+        if (winner != EMPTY) return {winner, lineCoords};
     }
 
     // Check main diagonal (top-left to bottom-right)
-    for (unsigned int i = 0; i < m_size; ++i) line[i] = m_board[i][i];
+    for (unsigned int i = 0; i < m_size; ++i) {
+        line[i] = m_board[i][i];
+        lineCoords[i] = {i, i};
+    }
     State winner = allEqual(line);
-    if (winner != EMPTY) return winner;
+    if (winner != EMPTY) return {winner, lineCoords};
 
     // Check anti-diagonal (top-right to bottom-left)
-    for (unsigned int i = 0; i < m_size; ++i) line[i] = m_board[i][m_size - 1 - i];
+    for (unsigned int i = 0; i < m_size; ++i) {
+        line[i] = m_board[i][m_size - 1 - i];
+        lineCoords[i] = {i, m_size - 1 - i};
+    }
     winner = allEqual(line);
-    if (winner != EMPTY) return winner;
+    if (winner != EMPTY) return {winner, lineCoords};
 
     // No winner found
-    return EMPTY;
+    return {EMPTY, std::vector<sf::Vector2u>()};
 }
-
 
 State Board::getState(unsigned int row, unsigned int col) const {
     return m_board[row][col];
-}
-
-unsigned int Board::getSize() const {
-    return m_size;
-}
-
-// DEBUGGING
-#include <iostream>
-void Board::DEBUG() {
-
-    // for(unsigned int y = 0; y < m_size; y++) {
-    //     for(unsigned int x = 0; x < m_size; x++) {
-    //         std::cout << m_board[y][x] << " ";
-    //     }
-    //     std::cout << std::endl;
-    // }
-    // std::cout << std::endl;
-
-    for(unsigned int y = 0; y < m_size; y++) {
-        for(unsigned int x = 0; x < m_size; x++) {
-            if(m_board[y][x] == EMPTY) {
-                std::cout << '_' << " ";
-            }
-            else if(m_board[y][x] == CROSS) {
-                std::cout << 'X' << " ";
-            }
-            else if(m_board[y][x] == NAUGHT) {
-                std::cout << 'O' << " ";
-            }
-        }
-        std::cout << std::endl;
-    }
-    std::cout << std::endl;
-
 }

@@ -22,7 +22,7 @@ This is a customizable Tic-Tac-Toe game developed in C++ using the SFML (Simple 
 
 Here’s a quick preview of the game:
 
-![Visualization](gifs/demo.gif)
+![Visualization](gifs/demo2.gif)
 
 
 ## Building the Project
@@ -35,7 +35,7 @@ Here’s a quick preview of the game:
 
 ### Setting up SFML
 1. **Clone the project**:
-   - Clone the Sorting Visualizer repository from GitHub:
+   - Clone the repository from GitHub:
    ```bash
    git clone https://github.com/varun0138/Tic-tac-toe
    cd Tic-tac-toe
@@ -64,7 +64,7 @@ Here’s a quick preview of the game:
       g++ *.o -o main -L ${SFML_LIB}  -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 
 
    clean:
-      del *.o 
+      del *.o *.exe
       
    run:
       ./main
@@ -78,7 +78,7 @@ Here’s a quick preview of the game:
 
 ## Future Improvements
 - **AI with Minimax Algorithm**: Implement an AI opponent using the Minimax algorithm for strategic gameplay.
-- **Highlight Winning Line**: Add visual effects to highlight the winning line when a player wins
+- ~~**Highlight Winning Line**: Add visual effects to highlight the winning line when a player wins~~
 - **DIfferent Modes**:
     - *Human vs AI*: Human plays against AI with options to adjust its difficulty.
     - *AI vs AI*: Watch two AI players compete against each other.

@@ -13,7 +13,7 @@ private:
     sf::Color m_labelColor = m_originalColor;
 
 public:
-    Label(const sf::Font& font, const sf::Vector2f& pos, const float size, const std::string& labelText);
+    Label(const sf::Font& font, const sf::Vector2f& pos, const float size, const std::string& labelText, Mode mode=DARK);
 
     void setLabel(const std::string& label);
     void setMode(Mode mode) override;

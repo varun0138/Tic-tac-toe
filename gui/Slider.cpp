@@ -6,11 +6,13 @@ static int mapValue(int value, float inMin, float inMax, float outMin, float out
 }
 
 
-Slider::Slider(const sf::Vector2f& pos, const sf::Vector2f& size)
+Slider::Slider(const sf::Vector2f& pos, const sf::Vector2f& size, Mode mode)
     : m_trackPos(pos), m_trackSize(size) {
 
     m_handlePos  = { pos.x, pos.y};
     m_handleSize = { size.x / 5.0f, size.y }; 
+
+    setMode(mode);
 }
 
 void Slider::setRange(int start, int end, int increment) {

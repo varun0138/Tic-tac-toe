@@ -1,6 +1,6 @@
 #include "Label.hpp"
 
-Label::Label(const sf::Font& font, const sf::Vector2f& pos, const float size, const std::string& labelText) {
+Label::Label(const sf::Font& font, const sf::Vector2f& pos, const float size, const std::string& labelText, Mode mode) {
     m_text.setFont(font);
     m_text.setPosition(pos);
     m_text.setCharacterSize(size);

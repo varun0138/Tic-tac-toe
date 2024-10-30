@@ -34,7 +34,7 @@ private:
     void moveHandle(const sf::Vector2f& mousePos);
 
 public:
-    Slider(const sf::Vector2f& pos, const sf::Vector2f& size);
+    Slider(const sf::Vector2f& pos, const sf::Vector2f& size, Mode mode=DARK);
 
     void setRange(int start, int end, int increment = 1);
     void setMode(Mode mode);

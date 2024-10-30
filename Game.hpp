@@ -23,12 +23,10 @@ private:
     const float m_windowWidth = 1100;
     const float m_windowHeight = 700;
 
-    const float m_boardWidth = 630;
-    const float m_boardHeight = m_boardWidth;
+    const float m_boardSize = 630;
 
     float m_tileSize;
     float m_gap;
-    float m_actualTileSize;
 
     std::stack<sf::Vector2u> m_moves;
     std::unique_ptr<Board> m_board;

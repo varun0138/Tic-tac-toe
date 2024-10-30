@@ -12,13 +12,9 @@ Game::Game() {
     m_resultLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 450), 32, m_resultText);
     m_sizeLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 250), 32, m_resultText);
 
-    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(700, 50), sf::Vector2f(160, 80), "RESET"));
-    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(900, 50), sf::Vector2f(160, 80), "UNDO"));
-    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(940, 600), sf::Vector2f(150, 80), "EXIT"));
-    
-    for(unsigned int i = 0; i < m_buttons.size(); i++) {
-        m_buttons[i]->setMode(LIGHT);
-    }
+    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(700, 50), sf::Vector2f(160, 80), "RESET", LIGHT));
+    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(900, 50), sf::Vector2f(160, 80), "UNDO", LIGHT));
+    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(940, 600), sf::Vector2f(150, 80), "EXIT", LIGHT));
 
     m_sizeSlider = std::make_unique<Slider>(sf::Vector2f(700, 300), sf::Vector2f(350, 25));
     m_sizeSlider->setRange(3, 17, 2);
@@ -33,9 +29,8 @@ void Game::run() {
 }
 
 void Game::init() {
-    m_tileSize = m_boardWidth / m_size;
+    m_tileSize = m_boardSize / m_size;
     m_gap = m_tileSize * 0.05;
-    m_actualTileSize = m_tileSize - m_gap;
 
     m_moves = std::stack<sf::Vector2u>();
     m_board = std::make_unique<Board>(m_size);
@@ -45,13 +40,17 @@ void Game::init() {
 
     m_playerText = std::string("Current Player: ") + ((m_currentPlayer == CROSS) ? "X" : "O");
     m_resultText = "Results: None";
-    m_sizeText = "SIZE: " + std::to_string(m_size);
+    m_sizeText   = "SIZE: " + std::to_string(m_size);
 }
 
 void Game::handleInput() {
     sf::Event event;
     while(m_window.pollEvent(event)) {
         switch(event.type) {
+            case sf::Event::Closed:
+                m_window.close();
+                break;
+
             case sf::Event::MouseButtonPressed:
                 if(event.mouseButton.button == sf::Mouse::Left) {
                     m_mouseClicked = true;
@@ -75,15 +74,21 @@ void Game::update() {
             m_moves.push({ row, col });
 
             // CHECK WIN
-            const State won = m_board->checkWin();
-            switch(won) {
+            const WinInfo won = m_board->checkWin();
+            switch(won.state) {
                 case CROSS:
                     m_resultText = "Results: Cross Wins";
+                    for(unsigned int i = 0; i < won.line.size(); i++) {
+                        m_board->setState(won.line[i].x, won.line[i].y, CROSS_WIN);
+                    }
                     m_gameEnded = true;
                     break;
 
                 case NAUGHT:
                     m_resultText = "Results: Naught Wins";
+                    for(unsigned int i = 0; i < won.line.size(); i++) {
+                        m_board->setState(won.line[i].x, won.line[i].y, NAUGHT_WIN);
+                    }
                     m_gameEnded = true;
                     break;
 
@@ -147,7 +152,7 @@ void Game::changeTurns() {
 void Game::renderSprite(const std::string& name, unsigned int x, unsigned int y) {
     sf::Sprite& sprite = m_assets.getSprite(name);
     sf::Vector2u size = sprite.getTexture()->getSize();
-    sf::Vector2f scale = { m_actualTileSize / size.x, m_actualTileSize / size.y };
+    sf::Vector2f scale = { (m_tileSize - m_gap) / size.x, (m_tileSize - m_gap) / size.y };
 
     sprite.setScale(scale);
     sprite.setPosition(sf::Vector2f(y * m_tileSize + m_boardPos.x, x * m_tileSize + m_boardPos.y));
@@ -160,9 +165,14 @@ void Game::render() {
     for(unsigned int y = 0; y < m_size; y++) {
         for(unsigned int x = 0; x < m_size; x++) {
             renderSprite("Tile", x, y);
-            
-            if(m_board->getState(x, y) == CROSS)       { renderSprite("Cross", x, y);  }
-            else if(m_board->getState(x, y) == NAUGHT) { renderSprite("Naught", x, y); }
+
+            switch(m_board->getState(x, y)) {
+                case CROSS:      renderSprite("Cross", x, y);     break;
+                case NAUGHT:     renderSprite("Naught", x, y);    break;
+                case CROSS_WIN:  renderSprite("CrossWin", x, y);  break;
+                case NAUGHT_WIN: renderSprite("NaughtWin", x, y); break;
+                default:                                          break;
+            }
         }
     }
 

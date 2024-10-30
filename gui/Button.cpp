@@ -1,17 +1,19 @@
 #include "Button.hpp"
 
-Button::Button(const sf::Font& font) {
+Button::Button(const sf::Font& font, const sf::Vector2f& pos, const sf::Vector2f& size, const std::string& label, Mode mode) {
     m_text.setFont(font);
-}
+    setMode(mode);
 
-Button::Button(const sf::Font& font, const sf::Vector2f& pos, const sf::Vector2f& size, const std::string& label)
-    : m_pos(pos), m_size(size), m_label(label) {
+    m_button.setPosition(pos);
+    m_button.setSize(size);
+    m_button.setOutlineThickness(m_thickness);
 
-    m_text.setFont(font);
-}
+    m_text.setCharacterSize(std::min(size.x, size.y) / 2.0f);
+    m_text.setString(label);
 
-void Button::setLabel(const std::string& label) {
-    m_label = label;
+    const sf::FloatRect bounds  = m_text.getLocalBounds();
+    const sf::Vector2f labelPos = { pos.x + size.x / 2.0f - bounds.width / 2.0f - bounds.left, pos.y + size.y / 2.0f - bounds.height / 2.0f - bounds.top };
+    m_text.setPosition(labelPos);
 }
 
 void Button::setMode(Mode mode) {
@@ -22,9 +24,12 @@ void Button::setMode(Mode mode) {
 }
 
 bool Button::buttonClicked(const sf::Vector2f& mousePos) {
+    const sf::Vector2f pos  = m_button.getPosition();
+    const sf::Vector2f size = m_button.getSize();
+
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left) && !m_buttonPressed) {
-        if(mousePos.x >= m_pos.x && mousePos.x <= m_pos.x + m_size.x) {
-            if(mousePos.y >= m_pos.y && mousePos.y <= m_pos.y + m_size.y) {
+        if(mousePos.x >= pos.x && mousePos.x <= pos.x + size.x) {
+            if(mousePos.y >= pos.y && mousePos.y <= pos.y + size.y) {
                 m_buttonPressed = true;
                 return true;
             }
@@ -37,31 +42,15 @@ bool Button::buttonClicked(const sf::Vector2f& mousePos) {
 }
 
 std::string Button::getLabel() const {
-    return m_label;
+    return m_text.getString();
 }
 
 void Button::draw(sf::RenderWindow& surface) {
-    
-    m_button.setPosition(m_pos);
-    m_button.setSize(m_size);
-    m_button.setFillColor(m_fillColor);
+    m_button.setFillColor(m_buttonPressed ? m_clickColor: m_fillColor);
     m_button.setOutlineColor(m_outlineColor);
-    m_button.setOutlineThickness(m_thickness);
 
-    if(m_buttonPressed) {
-        m_button.setFillColor(m_clickColor);
-    }
-
-    m_text.setString(m_label);
     m_text.setFillColor(m_labelColor);
-    // m_text.setCharacterSize(std::min(m_size.x / m_label.size(), m_size.y / 2.0f));
-    m_text.setCharacterSize(std::min(m_size.x, m_size.y) / 2.0f);
 
-    const sf::FloatRect bounds = m_text.getLocalBounds();
-    const sf::Vector2f labelPos = { m_pos.x + m_size.x / 2.0f - bounds.width / 2.0f - bounds.left, m_pos.y + m_size.y / 2.0f - bounds.height / 2.0f - bounds.top };
-    m_text.setPosition(labelPos);
- 
     surface.draw(m_button);
     surface.draw(m_text);
 }
-
