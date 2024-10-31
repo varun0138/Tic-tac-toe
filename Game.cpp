@@ -63,88 +63,103 @@ void Game::handleInput() {
 }
 
 void Game::update() {
-    if(m_mouseClicked && !m_gameEnded) {
-        sf::Vector2i mousePos = sf::Mouse::getPosition(m_window) - m_boardPos;
-        unsigned int row = mousePos.y / m_tileSize;
-        unsigned int col = mousePos.x / m_tileSize;
-
-        if(m_board->validCoords(row, col) && m_board->getState(row, col) == EMPTY) {
-            m_board->setState(row, col, m_currentPlayer);
-            m_moves.push({ row, col });
-
-            // CHECK WIN
-            const WinInfo won = m_board->checkWin();
-            switch(won.state) {
-                case CROSS:
-                    m_resultText = "Results: Cross Wins";
-                    for(unsigned int i = 0; i < won.line.size(); i++) {
-                        m_board->setState(won.line[i].x, won.line[i].y, CROSS_WIN);
-                    }
-                    m_gameEnded = true;
-                    break;
-
-                case NAUGHT:
-                    m_resultText = "Results: Naught Wins";
-                    for(unsigned int i = 0; i < won.line.size(); i++) {
-                        m_board->setState(won.line[i].x, won.line[i].y, NAUGHT_WIN);
-                    }
-                    m_gameEnded = true;
-                    break;
-
-                default:
-                    m_resultText = "Results: None";
-                    break;
+    // USER INTERFACE
+    {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
+        std::string clickedButton = "";
+        for(unsigned int i = 0; i < m_buttons.size(); i++) {
+            if(m_buttons[i]->buttonClicked(mousePos)) {
+                clickedButton = m_buttons[i]->getLabel();
+                break;
             }
+        }
 
-            // CHECK DRAW
-            if(m_board->checkDraw()) {
-                m_resultText = "Results: Game Draw";
-                m_gameEnded = true;
-            }
-
-            // CHANGE TURNS
+        if(clickedButton == "RESET") {
+            init();
+        }
+        else if(clickedButton == "UNDO" && !m_moves.empty() && !m_gameEnded) {
+            sf::Vector2u move = m_moves.top();
+            m_moves.pop();
+            m_board->setState(move.x, move.y, EMPTY);
             changeTurns();
         }
-    }
-    m_mouseClicked = false;
-
-    // UI
-    sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
-    std::string clickedButton = "";
-    for(unsigned int i = 0; i < m_buttons.size(); i++) {
-        if(m_buttons[i]->buttonClicked(mousePos)) {
-            clickedButton = m_buttons[i]->getLabel();
-            break;
+        else if(clickedButton == "EXIT") {
+            m_window.close();
         }
+
+        if(m_sizeSlider->isHandleMoved()) {
+            m_size = m_sizeSlider->getCurrentValue();
+            init();
+            m_sizeText = "SIZE: " + std::to_string(m_size);
+        }
+
+        m_playerLabel->setLabel(m_playerText);
+        m_resultLabel->setLabel(m_resultText);
+        m_sizeLabel->setLabel(m_sizeText);
     }
 
-    if(clickedButton == "RESET") {
-        init();
+    if(m_gameEnded) {
+        return;
     }
-    else if(clickedButton == "UNDO" && !m_moves.empty() && !m_gameEnded) {
-        sf::Vector2u move = m_moves.top();
-        m_moves.pop();
-        m_board->setState(move.x, move.y, EMPTY);
+
+    sf::Vector2u move = humanMove();
+    unsigned int row = move.x;
+    unsigned int col = move.y;
+
+    if(m_board->validCoords(row, col) && m_board->getState(row, col) == EMPTY) {
+        m_board->setState(row, col, m_currentPlayer);
+        m_moves.push(move);
+
+        // CHECK WIN
+        const WinInfo won = m_board->checkWin();
+        switch(won.state) {
+            case CROSS:
+                m_resultText = "Results: Cross Wins";
+                for(unsigned int i = 0; i < won.line.size(); i++) {
+                    m_board->setState(won.line[i].x, won.line[i].y, CROSS_WIN);
+                }
+                m_gameEnded = true;
+                break;
+
+            case NAUGHT:
+                m_resultText = "Results: Naught Wins";
+                for(unsigned int i = 0; i < won.line.size(); i++) {
+                    m_board->setState(won.line[i].x, won.line[i].y, NAUGHT_WIN);
+                }
+                m_gameEnded = true;
+                break;
+
+            default:
+                m_resultText = "Results: None";
+                break;
+        }
+
+        // CHECK DRAW
+        if(m_board->checkDraw()) {
+            m_resultText = "Results: Game Draw";
+            m_gameEnded = true;
+        }
+
+        // CHANGE TURNS
         changeTurns();
     }
-    else if(clickedButton == "EXIT") {
-        m_window.close();
-    }
-
-    if(m_sizeSlider->isHandleMoved()) {
-        m_size = m_sizeSlider->getCurrentValue();
-        init();
-        m_sizeText = "SIZE: " + std::to_string(m_size);
-    }
-
-    m_playerLabel->setLabel(m_playerText);
-    m_resultLabel->setLabel(m_resultText);
-    m_sizeLabel->setLabel(m_sizeText);
 }
 
 void Game::changeTurns() {
     m_currentPlayer = (m_currentPlayer == CROSS) ? NAUGHT : CROSS;
     m_playerText = std::string("Current Player: ") + ((m_currentPlayer == CROSS) ? "X" : "O");
+}
+
+sf::Vector2u Game::humanMove() {
+    if(m_mouseClicked) {
+        sf::Vector2i mousePos = sf::Mouse::getPosition(m_window) - m_boardPos;
+        unsigned int row = mousePos.y / m_tileSize;
+        unsigned int col = mousePos.x / m_tileSize;
+
+        m_mouseClicked = false;
+        return { row, col };
+    }
+    return { m_size, m_size };
 }
 
 

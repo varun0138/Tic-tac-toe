@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <memory>
+#include <vector>
 #include <stack>
 
 #include "Board.hpp"
@@ -49,6 +50,7 @@ private:
     void init();
     void renderSprite(const std::string& name, unsigned int x, unsigned int y);
     void changeTurns();
+    sf::Vector2u humanMove();
 
     void handleInput();
     void update();
