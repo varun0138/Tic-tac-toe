@@ -1,6 +1,8 @@
 #pragma once 
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Text.hpp>
+#include <SFML/Graphics/Color.hpp>
 
 #include "UserInterface.hpp"
 
@@ -9,14 +11,13 @@ private:
     sf::Text m_text;
     std::string m_labelText;
 
-    sf::Color m_originalColor = {57, 62, 67, 255};
-    sf::Color m_labelColor = m_originalColor;
+    sf::Color m_labelColor;
 
 public:
-    Label(const sf::Font& font, const sf::Vector2f& pos, const float size, const std::string& labelText, Mode mode=DARK);
+    Label(const sf::Font& font, const sf::Vector2f& pos, float size, const std::string& labelText, Mode mode);
 
     void setLabel(const std::string& label);
+    
     void setMode(Mode mode) override;
-
     void draw(sf::RenderWindow& surface) override;
 };

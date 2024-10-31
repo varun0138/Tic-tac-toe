@@ -8,16 +8,15 @@ Game::Game() {
 
     init();
 
-    m_playerLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 400), 32, m_playerText);
-    m_resultLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 450), 32, m_resultText);
-    m_sizeLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 250), 32, m_resultText);
+    m_playerLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 400), 32, m_playerText, DARK);
+    m_resultLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 450), 32, m_resultText, DARK);
+    m_sizeLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 250), 32, m_resultText, DARK);
 
-    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(700, 50), sf::Vector2f(160, 80), "RESET", LIGHT));
-    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(900, 50), sf::Vector2f(160, 80), "UNDO", LIGHT));
-    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(940, 600), sf::Vector2f(150, 80), "EXIT", LIGHT));
+    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(700, 50), sf::Vector2f(160, 80), 2.0f, "RESET", LIGHT));
+    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(900, 50), sf::Vector2f(160, 80), 2.0f, "UNDO", LIGHT));
+    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(940, 600), sf::Vector2f(150, 80), 2.0f, "EXIT", LIGHT));
 
-    m_sizeSlider = std::make_unique<Slider>(sf::Vector2f(700, 300), sf::Vector2f(350, 25));
-    m_sizeSlider->setRange(3, 17, 2);
+    m_sizeSlider = std::make_unique<Slider>(sf::Vector2f(700, 300), sf::Vector2f(350, 25), 3.0f, 3, 17, 2, DARK);
 }
 
 void Game::run() {
@@ -110,7 +109,7 @@ void Game::update() {
     m_mouseClicked = false;
 
     // UI
-    sf::Vector2f mousePos = (sf::Vector2f)sf::Mouse::getPosition(m_window);
+    sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
     std::string clickedButton = "";
     for(unsigned int i = 0; i < m_buttons.size(); i++) {
         if(m_buttons[i]->buttonClicked(mousePos)) {
@@ -132,7 +131,7 @@ void Game::update() {
         m_window.close();
     }
 
-    if(m_sizeSlider->isMoved()) {
+    if(m_sizeSlider->isHandleMoved()) {
         m_size = m_sizeSlider->getCurrentValue();
         init();
         m_sizeText = "SIZE: " + std::to_string(m_size);

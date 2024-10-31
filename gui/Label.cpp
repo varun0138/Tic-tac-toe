@@ -1,10 +1,15 @@
 #include "Label.hpp"
 
-Label::Label(const sf::Font& font, const sf::Vector2f& pos, const float size, const std::string& labelText, Mode mode) {
+Label::Label(const sf::Font& font, const sf::Vector2f& pos, float size, const std::string& labelText, Mode mode) {
     m_text.setFont(font);
     m_text.setPosition(pos);
     m_text.setCharacterSize(size);
     m_labelText = labelText;
+
+    m_labelColor = {57, 62, 67, 255};
+    if(mode == LIGHT) {
+        setMode(mode);
+    }
 }
 
 void Label::setLabel(const std::string& label) {
@@ -12,7 +17,7 @@ void Label::setLabel(const std::string& label) {
 }
 
 void Label::setMode(Mode mode) {
-    m_labelColor = convertMode(m_originalColor, mode);
+    m_labelColor = convertMode(m_labelColor);
 }
 
 void Label::draw(sf::RenderWindow& surface) {

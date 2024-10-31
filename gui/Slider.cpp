@@ -1,92 +1,102 @@
+#include <SFML/Window/Mouse.hpp>
+#include <cmath>
+
 #include "Slider.hpp"
 
-static int mapValue(int value, float inMin, float inMax, float outMin, float outMax) {
+static inline int mapValue(int value, float inMin, float inMax, float outMin, float outMax) {
     if (inMax == inMin) return outMin;
     return outMin + (value - inMin) * (outMax - outMin) / (inMax - inMin);
 }
 
 
-Slider::Slider(const sf::Vector2f& pos, const sf::Vector2f& size, Mode mode)
-    : m_trackPos(pos), m_trackSize(size) {
+Slider::Slider(const sf::Vector2f& pos, const sf::Vector2f& size, float thickness, int start, int end, int step, Mode mode) {
+    m_track.setPosition(pos);
+    m_track.setSize(size);
+    m_track.setOutlineThickness(thickness);
 
-    m_handlePos  = { pos.x, pos.y};
-    m_handleSize = { size.x / 5.0f, size.y }; 
+    m_handle.setPosition(pos);
+    m_handle.setSize(sf::Vector2f(size.x / 5.0f, size.y));
+    m_handle.setOutlineThickness(thickness);
 
-    setMode(mode);
-}
+    m_colors["Fill Color"]    = {220, 220, 220, 255};
+    m_colors["Click Color"]   = {146, 134, 148, 255};
+    m_colors["Outline Color"] = {57,  62,  67,  255};
 
-void Slider::setRange(int start, int end, int increment) {
+    if(mode == LIGHT) {
+        setMode(mode);
+    }
+
     m_start = start;
     m_end = end;
-    m_increment = increment > 0 ? increment : 1; // Ensure increment is positive
+    m_step = step > 0 ? step : 1;
     m_current = start;
 }
 
 void Slider::setMode(Mode mode) {
-    m_fillColor    = convertMode(m_colors[0], mode);
-    m_clickColor   = convertMode(m_colors[1], mode);
-    m_outlineColor = convertMode(m_colors[2], mode);
+    m_colors["Fill Color"]    = convertMode(m_colors["Fill Color"]);
+    m_colors["Click Color"]   = convertMode(m_colors["Fill Color"]);
+    m_colors["Outline Color"] = convertMode(m_colors["Fill Color"]);
 }
 
 int Slider::getCurrentValue() const {
     return m_current;
 }
 
-void Slider::draw(sf::RenderWindow& surface) {
-    sf::Vector2f mousePos = (sf::Vector2f)sf::Mouse::getPosition(surface);
-    moveHandle(mousePos);
-
-    m_track.setPosition(m_trackPos);
-    m_track.setSize(m_trackSize);
-    m_track.setFillColor(m_fillColor);
-    m_track.setOutlineColor(m_outlineColor);
-    m_track.setOutlineThickness(m_thickness);
-
-    m_handle.setPosition(m_handlePos);
-    m_handle.setSize(m_handleSize);
-    m_handle.setFillColor(m_outlineColor);
-    m_handle.setOutlineColor(m_outlineColor);
-    m_handle.setOutlineThickness(m_thickness);
-
-    // Get the current value using mapValue
-    int value = mapValue(m_handlePos.x, m_trackPos.x, m_trackPos.x + m_trackSize.x - m_handleSize.x, m_start, m_end);
-
-    // Snap to the nearest increment
-    m_current = m_start + ((value - m_start + m_increment / 2) / m_increment) * m_increment;
-
-    surface.draw(m_track);
-    surface.draw(m_handle);
-}
-
-
-bool Slider::isMoved() {
-    bool moved = (m_handlePos != m_previousHandlePos);
-    m_previousHandlePos = m_handlePos;
+bool Slider::isHandleMoved() {
+    sf::Vector2f handlePos = m_handle.getPosition();
+    bool moved = (handlePos != m_previousHandlePos);
+    m_previousHandlePos = handlePos;
     return moved;
 }
 
+void Slider::setMovement(bool move) {
+    m_handleMovement = move;
+}
 
-void Slider::moveHandle(const sf::Vector2f& mousePos) {
-    // Check if the mouse button is pressed
-    if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-        // If handle is not grabbed yet, check if the mouse clicked on the handle
-        if (!m_handleGrabbed) {
-            if (mousePos.x >= m_handlePos.x && mousePos.x <= m_handlePos.x + m_handleSize.x &&
-                mousePos.y >= m_handlePos.y && mousePos.y <= m_handlePos.y + m_handleSize.y) {
-                m_handleGrabbed = true;  // The mouse clicked the handle
+void Slider::draw(sf::RenderWindow& surface) {
+    const sf::Vector2i mousePos = sf::Mouse::getPosition(surface);
+    moveHandle(mousePos);
+
+    // TRACK
+    m_track.setFillColor(m_colors["Fill Color"]);
+    m_track.setOutlineColor(m_colors["Outline Color"]);
+    surface.draw(m_track);
+
+    // HANDLE
+    m_handle.setFillColor(m_colors["Outline Color"]);
+    m_handle.setOutlineColor(m_colors["Outline Color"]);
+    surface.draw(m_handle);
+}
+
+void Slider::moveHandle(const sf::Vector2i& mousesPos) {
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Left) && m_handleMovement) {
+        if(!m_handleGrabbed) {
+            if(m_handle.getGlobalBounds().contains((sf::Vector2f)mousesPos)) {
+                m_handleGrabbed = true;
             }
         }
 
-        // If the handle is grabbed, move it with the mouse
-        if (m_handleGrabbed) {
-            m_handlePos.x = mousePos.x - m_handleSize.x / 2.0f;  // Center handle on mouse
-            // Clamp the handle position within the track bounds
-            if (m_handlePos.x < m_trackPos.x) m_handlePos.x = m_trackPos.x;
-            if (m_handlePos.x > m_trackPos.x + m_trackSize.x - m_handleSize.x) 
-                m_handlePos.x = m_trackPos.x + m_trackSize.x - m_handleSize.x;
+        if(m_handleGrabbed) {
+            sf::Vector2f trackPos = m_track.getPosition();
+            sf::Vector2f trackSize = m_track.getSize();
+            sf::Vector2f handlePos = m_handle.getPosition();
+            sf::Vector2f handleSize = m_handle.getSize();
+
+            handlePos.x = mousesPos.x - handleSize.x / 2.0f;
+            if (handlePos.x < trackPos.x) {
+                handlePos.x = trackPos.x;
+            }
+            if (handlePos.x > trackPos.x + trackSize.x - handleSize.x) {
+                handlePos.x = trackPos.x + trackSize.x - handleSize.x;
+            } 
+            
+            m_handle.setPosition(handlePos);
+
+            int value = mapValue(handlePos.x, trackPos.x, trackPos.x + trackSize.x - handleSize.x, m_start, m_end);
+            m_current = std::floor(m_start + ((value - m_start + m_step / 2) / m_step) * m_step);
         }
-    } else {
-        // Release the handle when the mouse button is released
-        m_handleGrabbed = false;
     }
+    else {
+        m_handleGrabbed = false;
+    }    
 }
