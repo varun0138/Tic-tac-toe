@@ -23,7 +23,7 @@ This is a customizable Tic-Tac-Toe game developed in C++ using the SFML (Simple 
 
 Here’s a quick preview of the game:
 
-![Visualization](gifs/demo4.gif)
+![Visualization](gifs/demo5.gif)
 
 
 ## Building the Project

@@ -11,16 +11,16 @@ Game::Game() {
     m_labels["Game Size"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 50), 32, "", DARK);
 
     m_labels["Player X"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 200), 30, "Player:X", DARK);
-    m_labels["Player O"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 300), 30, "Player:O", DARK);
+    m_labels["Player O"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(900, 200), 30, "Player:O", DARK);
 
     init();
 
     m_sizeSlider = std::make_unique<Slider>(sf::Vector2f(700, 100), sf::Vector2f(350, 25), 3.0f, 3, 17, 2, DARK);
 
-    m_players = { "Human", "Random" };
+    m_players = { "Human", "Random", "Greedy" };
 
-    m_crossPlayerMenu = std::make_unique<Dropdownbox>(m_assets.getFont("Hack"), sf::Vector2f(870, 190), sf::Vector2f(210, 60), 1.0f, "None", m_players, LIGHT);
-    m_naughtPlayerMenu = std::make_unique<Dropdownbox>(m_assets.getFont("Hack"), sf::Vector2f(870, 290), sf::Vector2f(210, 60), 1.0f, "None", m_players, LIGHT);
+    m_crossPlayerMenu = std::make_unique<Dropdownbox>(m_assets.getFont("Hack"), sf::Vector2f(680, 250), sf::Vector2f(180, 60), 1.0f, "None", m_players, LIGHT);
+    m_naughtPlayerMenu = std::make_unique<Dropdownbox>(m_assets.getFont("Hack"), sf::Vector2f(890, 250), sf::Vector2f(180, 60), 1.0f, "None", m_players, LIGHT);
 }
 
 void Game::run() {
@@ -90,6 +90,9 @@ void Game::update() {
     }
     else if(player == "Random") {
         move = gameAi.randomMove(*m_board, m_size);
+    }
+    else if(player == "Greedy") {
+        move = gameAi.greedyMove(*m_board, m_size, m_currentPlayer);
     }
 
     unsigned int row = move.x;
