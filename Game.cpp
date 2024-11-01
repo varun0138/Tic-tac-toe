@@ -10,9 +10,17 @@ Game::Game() {
     m_labels["Final Result"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 450), 32, "", DARK);
     m_labels["Game Size"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 50), 32, "", DARK);
 
+    m_labels["Player X"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 200), 30, "Player:X", DARK);
+    m_labels["Player O"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 300), 30, "Player:O", DARK);
+
     init();
 
-    m_sizeSlider = std::make_unique<Slider>(sf::Vector2f(700, 300), sf::Vector2f(350, 25), 3.0f, 3, 17, 2, DARK);
+    m_sizeSlider = std::make_unique<Slider>(sf::Vector2f(700, 100), sf::Vector2f(350, 25), 3.0f, 3, 17, 2, DARK);
+
+    m_players = { "Human", "Random" };
+
+    m_crossPlayerMenu = std::make_unique<Dropdownbox>(m_assets.getFont("Hack"), sf::Vector2f(870, 190), sf::Vector2f(210, 60), 1.0f, "None", m_players, LIGHT);
+    m_naughtPlayerMenu = std::make_unique<Dropdownbox>(m_assets.getFont("Hack"), sf::Vector2f(870, 290), sf::Vector2f(210, 60), 1.0f, "None", m_players, LIGHT);
 }
 
 void Game::run() {
@@ -64,11 +72,26 @@ void Game::update() {
         init();
         m_labels["Game Size"]->caption = "SIZE: " + std::to_string(m_size);
     }
+
+    std::string player = "";
+    if(m_currentPlayer == CROSS) {
+        player = m_crossPlayerMenu->getSelectedItem();
+    }
+    else if(m_currentPlayer == NAUGHT) {
+        player = m_naughtPlayerMenu->getSelectedItem();
+    }
     
     // GAME LOGIC
     if(m_gameEnded) { return; }
 
-    sf::Vector2u move = humanMove();
+    sf::Vector2u move = { m_size, m_size };
+    if(player == "Human") {
+        move = humanMove();
+    }
+    else if(player == "Random") {
+        move = gameAi.randomMove(*m_board, m_size);
+    }
+
     unsigned int row = move.x;
     unsigned int col = move.y;
 
@@ -160,6 +183,9 @@ void Game::render() {
     }
 
     m_sizeSlider->draw(m_window);
+
+    m_naughtPlayerMenu->draw(m_window);
+    m_crossPlayerMenu->draw(m_window);
 
     m_window.display();
 }
