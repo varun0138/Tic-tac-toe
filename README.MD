@@ -8,10 +8,7 @@ This is a customizable Tic-Tac-Toe game developed in C++ using the SFML (Simple 
     - Clear indicators for the current player and game results.
 
 - **Custom User Controls**:
-    - *Size Selector*: Change the grid size for games larger than the standard 3x3 (e.g., 5x5, 9x9).
-    - *Undo Functionality*: Go back to the previous move.
-    - *Reset Button*: Start a new game at any point.
-    - *Exit Button*: Quit the game safely.
+    - *Size Selector*: Change the grid size for games larger than the standard 3x3 (e.g., 5x5, 9x9) while reseting a new game at any point.
 
 - **Game Logic**:
     - Supports standard Tic-Tac-Toe rules for any grid size.
@@ -22,7 +19,7 @@ This is a customizable Tic-Tac-Toe game developed in C++ using the SFML (Simple 
 
 Here’s a quick preview of the game:
 
-![Visualization](gifs/demo2.gif)
+![Visualization](gifs/demo3.gif)
 
 
 ## Building the Project

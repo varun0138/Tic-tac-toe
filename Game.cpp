@@ -12,10 +12,6 @@ Game::Game() {
     m_resultLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 450), 32, m_resultText, DARK);
     m_sizeLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 250), 32, m_resultText, DARK);
 
-    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(700, 50), sf::Vector2f(160, 80), 2.0f, "RESET", LIGHT));
-    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(900, 50), sf::Vector2f(160, 80), 2.0f, "UNDO", LIGHT));
-    m_buttons.push_back(std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(940, 600), sf::Vector2f(150, 80), 2.0f, "EXIT", LIGHT));
-
     m_sizeSlider = std::make_unique<Slider>(sf::Vector2f(700, 300), sf::Vector2f(350, 25), 3.0f, 3, 17, 2, DARK);
 }
 
@@ -64,43 +60,18 @@ void Game::handleInput() {
 
 void Game::update() {
     // USER INTERFACE
-    {
-        sf::Vector2i mousePos = sf::Mouse::getPosition(m_window);
-        std::string clickedButton = "";
-        for(unsigned int i = 0; i < m_buttons.size(); i++) {
-            if(m_buttons[i]->buttonClicked(mousePos)) {
-                clickedButton = m_buttons[i]->getLabel();
-                break;
-            }
-        }
-
-        if(clickedButton == "RESET") {
-            init();
-        }
-        else if(clickedButton == "UNDO" && !m_moves.empty() && !m_gameEnded) {
-            sf::Vector2u move = m_moves.top();
-            m_moves.pop();
-            m_board->setState(move.x, move.y, EMPTY);
-            changeTurns();
-        }
-        else if(clickedButton == "EXIT") {
-            m_window.close();
-        }
-
-        if(m_sizeSlider->isHandleMoved()) {
-            m_size = m_sizeSlider->getCurrentValue();
-            init();
-            m_sizeText = "SIZE: " + std::to_string(m_size);
-        }
-
-        m_playerLabel->setLabel(m_playerText);
-        m_resultLabel->setLabel(m_resultText);
-        m_sizeLabel->setLabel(m_sizeText);
+    if(m_sizeSlider->isHandleMoved()) {
+        m_size = m_sizeSlider->getCurrentValue();
+        init();
+        m_sizeText = "SIZE: " + std::to_string(m_size);
     }
 
-    if(m_gameEnded) {
-        return;
-    }
+    m_playerLabel->setLabel(m_playerText);
+    m_resultLabel->setLabel(m_resultText);
+    m_sizeLabel->setLabel(m_sizeText);
+    
+    // GAME LOGIC
+    if(m_gameEnded) { return; }
 
     sf::Vector2u move = humanMove();
     unsigned int row = move.x;
@@ -193,10 +164,6 @@ void Game::render() {
     m_playerLabel->draw(m_window);
     m_resultLabel->draw(m_window);
     m_sizeLabel->draw(m_window);
-
-    for(unsigned int i = 0; i < m_buttons.size(); i++) {
-        m_buttons[i]->draw(m_window);
-    }
 
     m_sizeSlider->draw(m_window);
 

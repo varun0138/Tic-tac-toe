@@ -8,7 +8,6 @@
 #include "Board.hpp"
 #include "AssetManager.hpp"
 #include "gui/Label.hpp"
-#include "gui/Button.hpp"
 #include "gui/Slider.hpp"
 
 class Game {
@@ -42,8 +41,6 @@ private:
     std::unique_ptr<Label> m_playerLabel;
     std::unique_ptr<Label> m_resultLabel;
     std::unique_ptr<Label> m_sizeLabel;
-
-    std::vector<std::unique_ptr<Button>> m_buttons;
 
     std::unique_ptr<Slider> m_sizeSlider;
 
