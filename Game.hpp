@@ -3,7 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include <memory>
 #include <vector>
-#include <stack>
+#include <map>
 
 #include "Board.hpp"
 #include "AssetManager.hpp"
@@ -28,19 +28,12 @@ private:
     float m_tileSize;
     float m_gap;
 
-    std::stack<sf::Vector2u> m_moves;
     std::unique_ptr<Board> m_board;
     State m_currentPlayer;
     bool m_mouseClicked;
     bool m_gameEnded;
 
-    std::string m_playerText;
-    std::string m_resultText;
-    std::string m_sizeText;
-
-    std::unique_ptr<Label> m_playerLabel;
-    std::unique_ptr<Label> m_resultLabel;
-    std::unique_ptr<Label> m_sizeLabel;
+    std::map<std::string, std::unique_ptr<Label>> m_labels;
 
     std::unique_ptr<Slider> m_sizeSlider;
 

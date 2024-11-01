@@ -6,11 +6,11 @@ Game::Game() {
     m_window.create(sf::VideoMode(m_windowWidth, m_windowHeight), "", sf::Style::Close | sf::Style::Titlebar);
     m_assets.loadFromFile("./assets.txt");
 
-    init();
+    m_labels["Current Player"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 400), 32, "", DARK);
+    m_labels["Final Result"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 450), 32, "", DARK);
+    m_labels["Game Size"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 50), 32, "", DARK);
 
-    m_playerLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 400), 32, m_playerText, DARK);
-    m_resultLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 450), 32, m_resultText, DARK);
-    m_sizeLabel = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 250), 32, m_resultText, DARK);
+    init();
 
     m_sizeSlider = std::make_unique<Slider>(sf::Vector2f(700, 300), sf::Vector2f(350, 25), 3.0f, 3, 17, 2, DARK);
 }
@@ -27,15 +27,14 @@ void Game::init() {
     m_tileSize = m_boardSize / m_size;
     m_gap = m_tileSize * 0.05;
 
-    m_moves = std::stack<sf::Vector2u>();
     m_board = std::make_unique<Board>(m_size);
     m_currentPlayer = CROSS;
     m_mouseClicked = false;
     m_gameEnded = false;
 
-    m_playerText = std::string("Current Player: ") + ((m_currentPlayer == CROSS) ? "X" : "O");
-    m_resultText = "Results: None";
-    m_sizeText   = "SIZE: " + std::to_string(m_size);
+    m_labels["Current Player"]->caption = std::string("Current Player: ") + ((m_currentPlayer == CROSS) ? "X" : "O");
+    m_labels["Final Result"]->caption   = "Results: None";
+    m_labels["Game Size"]->caption      = "SIZE: " + std::to_string(m_size);
 }
 
 void Game::handleInput() {
@@ -63,12 +62,8 @@ void Game::update() {
     if(m_sizeSlider->isHandleMoved()) {
         m_size = m_sizeSlider->getCurrentValue();
         init();
-        m_sizeText = "SIZE: " + std::to_string(m_size);
+        m_labels["Game Size"]->caption = "SIZE: " + std::to_string(m_size);
     }
-
-    m_playerLabel->setLabel(m_playerText);
-    m_resultLabel->setLabel(m_resultText);
-    m_sizeLabel->setLabel(m_sizeText);
     
     // GAME LOGIC
     if(m_gameEnded) { return; }
@@ -79,13 +74,12 @@ void Game::update() {
 
     if(m_board->validCoords(row, col) && m_board->getState(row, col) == EMPTY) {
         m_board->setState(row, col, m_currentPlayer);
-        m_moves.push(move);
 
         // CHECK WIN
         const WinInfo won = m_board->checkWin();
         switch(won.state) {
             case CROSS:
-                m_resultText = "Results: Cross Wins";
+                m_labels["Final Result"]->caption = "Results: Cross Wins";
                 for(unsigned int i = 0; i < won.line.size(); i++) {
                     m_board->setState(won.line[i].x, won.line[i].y, CROSS_WIN);
                 }
@@ -93,7 +87,7 @@ void Game::update() {
                 break;
 
             case NAUGHT:
-                m_resultText = "Results: Naught Wins";
+                m_labels["Final Result"]->caption = "Results: Naught Wins";
                 for(unsigned int i = 0; i < won.line.size(); i++) {
                     m_board->setState(won.line[i].x, won.line[i].y, NAUGHT_WIN);
                 }
@@ -101,13 +95,13 @@ void Game::update() {
                 break;
 
             default:
-                m_resultText = "Results: None";
+                m_labels["Final Result"]->caption = "Results: None";
                 break;
         }
 
         // CHECK DRAW
         if(m_board->checkDraw()) {
-            m_resultText = "Results: Game Draw";
+            m_labels["Final Result"]->caption = "Results: Game Draw";
             m_gameEnded = true;
         }
 
@@ -118,7 +112,7 @@ void Game::update() {
 
 void Game::changeTurns() {
     m_currentPlayer = (m_currentPlayer == CROSS) ? NAUGHT : CROSS;
-    m_playerText = std::string("Current Player: ") + ((m_currentPlayer == CROSS) ? "X" : "O");
+    m_labels["Current Player"]->caption = std::string("Current Player: ") + ((m_currentPlayer == CROSS) ? "X" : "O");
 }
 
 sf::Vector2u Game::humanMove() {
@@ -161,9 +155,9 @@ void Game::render() {
         }
     }
 
-    m_playerLabel->draw(m_window);
-    m_resultLabel->draw(m_window);
-    m_sizeLabel->draw(m_window);
+    for(const auto&[key, value]: m_labels) {
+        m_labels[key]->draw(m_window);
+    }
 
     m_sizeSlider->draw(m_window);
 

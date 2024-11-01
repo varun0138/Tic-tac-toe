@@ -1,27 +1,23 @@
 #include "Label.hpp"
 
-Label::Label(const sf::Font& font, const sf::Vector2f& pos, float size, const std::string& labelText, Mode mode) {
+Label::Label(const sf::Font& font, const sf::Vector2f& pos, float size, const std::string& cap, Mode mode) {
     m_text.setFont(font);
     m_text.setPosition(pos);
     m_text.setCharacterSize(size);
-    m_labelText = labelText;
+    caption = cap;
 
-    m_labelColor = {57, 62, 67, 255};
+    m_color = {57, 62, 67, 255};
     if(mode == LIGHT) {
         setMode(mode);
     }
 }
 
-void Label::setLabel(const std::string& label) {
-    m_labelText = label;
-}
-
 void Label::setMode(Mode mode) {
-    m_labelColor = convertMode(m_labelColor);
+    m_color = convertMode(m_color);
 }
 
 void Label::draw(sf::RenderWindow& surface) {
-    m_text.setString(m_labelText);
-    m_text.setFillColor(m_labelColor);
+    m_text.setString(caption);
+    m_text.setFillColor(m_color);
     surface.draw(m_text);
 }

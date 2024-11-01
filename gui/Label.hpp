@@ -9,14 +9,12 @@
 class Label: public UserInterface {
 private:
     sf::Text m_text;
-    std::string m_labelText;
-
-    sf::Color m_labelColor;
+    sf::Color m_color;
 
 public:
-    Label(const sf::Font& font, const sf::Vector2f& pos, float size, const std::string& labelText, Mode mode);
+    std::string caption;
 
-    void setLabel(const std::string& label);
+    Label(const sf::Font& font, const sf::Vector2f& pos, float size, const std::string& cap, Mode mode);
     
     void setMode(Mode mode) override;
     void draw(sf::RenderWindow& surface) override;
