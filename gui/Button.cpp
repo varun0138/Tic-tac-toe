@@ -28,9 +28,9 @@ Button::Button(const sf::Font& font, const sf::Vector2f& pos, const sf::Vector2f
 
 void Button::setMode(Mode mode) {
     m_colors["Fill Color"]    = convertMode(m_colors["Fill Color"]);
-    m_colors["Click Color"]   = convertMode(m_colors["Fill Color"]);
-    m_colors["Outline Color"] = convertMode(m_colors["Fill Color"]);
-    m_colors["Label Color"]   = convertMode(m_colors["Fill Color"]);
+    m_colors["Click Color"]   = convertMode(m_colors["Click Color"]);
+    m_colors["Outline Color"] = convertMode(m_colors["Outline Color"]);
+    m_colors["Label Color"]   = convertMode(m_colors["Label Color"]);
 }
 
 bool Button::buttonClicked(const sf::Vector2i& mousePos) {

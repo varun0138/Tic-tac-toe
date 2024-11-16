@@ -63,9 +63,9 @@ std::string Dropdownbox::getSelectedItem() const {
 
 void Dropdownbox::setMode(Mode mode) {
     m_colors["Fill Color"]    = convertMode(m_colors["Fill Color"]);
-    m_colors["Click Color"]   = convertMode(m_colors["Fill Color"]);
-    m_colors["Outline Color"] = convertMode(m_colors["Fill Color"]);
-    m_colors["Label Color"]   = convertMode(m_colors["Fill Color"]);
+    m_colors["Click Color"]   = convertMode(m_colors["Click Color"]);
+    m_colors["Outline Color"] = convertMode(m_colors["Outline Color"]);
+    m_colors["Label Color"]   = convertMode(m_colors["Label Color"]);
 }
 
 void Dropdownbox::draw(sf::RenderWindow& surface) {

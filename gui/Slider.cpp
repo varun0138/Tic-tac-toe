@@ -34,8 +34,8 @@ Slider::Slider(const sf::Vector2f& pos, const sf::Vector2f& size, float thicknes
 
 void Slider::setMode(Mode mode) {
     m_colors["Fill Color"]    = convertMode(m_colors["Fill Color"]);
-    m_colors["Click Color"]   = convertMode(m_colors["Fill Color"]);
-    m_colors["Outline Color"] = convertMode(m_colors["Fill Color"]);
+    m_colors["Click Color"]   = convertMode(m_colors["Click Color"]);
+    m_colors["Outline Color"] = convertMode(m_colors["Outline Color"]);
 }
 
 int Slider::getCurrentValue() const {
