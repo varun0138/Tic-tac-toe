@@ -8,8 +8,9 @@ This is a customizable Tic-Tac-Toe game developed in C++ using the SFML (Simple 
     - Clear indicators for the current player and game results.
 
 - **Custom User Controls**:
-    - Size Selector: Change the grid size for games larger than the standard 3x3 (e.g., 5x5, 9x9) while reseting a new game at any point.
-    - DIfferent Modes:
+    - **Size Selector**: Change the grid size for games larger than the standard 3x3 (e.g., 5x5, 9x9) while reseting a new game at any point.
+    - **AI Turn Button**: Gives users control over when the AI plays, making it ideal for debugging or learning.
+    - **Different Modes**:
       - Human vs Human: Human plays against other human
       - Human vs AI: Human plays against AI with options to adjust its difficulty.
       - AI vs AI: Watch two AI players compete against each other.
@@ -23,7 +24,7 @@ This is a customizable Tic-Tac-Toe game developed in C++ using the SFML (Simple 
 
 Here’s a quick preview of the game:
 
-![Visualization](gifs/demo5.gif)
+![Visualization](gifs/demo6.gif)
 
 
 ## Building the Project

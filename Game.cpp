@@ -6,21 +6,24 @@ Game::Game() {
     m_window.create(sf::VideoMode(m_windowWidth, m_windowHeight), "", sf::Style::Close | sf::Style::Titlebar);
     m_assets.loadFromFile("./assets.txt");
 
-    m_labels["Current Player"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 400), 32, "", DARK);
-    m_labels["Final Result"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 450), 32, "", DARK);
+    m_labels["Current Player"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 470), 32, "", DARK);
+    m_labels["Final Result"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 520), 32, "", DARK);
     m_labels["Game Size"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 50), 32, "", DARK);
 
-    m_labels["Player X"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 200), 30, "Player:X", DARK);
-    m_labels["Player O"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(900, 200), 30, "Player:O", DARK);
+    m_labels["Player X"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(700, 300), 30, "Player:X", DARK);
+    m_labels["Player O"] = std::make_unique<Label>(m_assets.getFont("Hack"), sf::Vector2f(900, 300), 30, "Player:O", DARK);
 
     init();
 
     m_sizeSlider = std::make_unique<Slider>(sf::Vector2f(700, 100), sf::Vector2f(350, 25), 3.0f, 3, 17, 2, DARK);
 
+    m_turnCheckbox = std::make_unique<Checkbox>(m_assets.getFont("Hack"), sf::Vector2f(680, 180), 60.0f, 1.0f, "", LIGHT);
+    m_turnButton = std::make_unique<Button>(m_assets.getFont("Hack"), sf::Vector2f(760, 180), sf::Vector2f(330, 60), 1.0f, "Do Single AI Turn", LIGHT);
+
     m_players = { "Human", "Random", "Greedy" };
 
-    m_crossPlayerMenu = std::make_unique<Dropdownbox>(m_assets.getFont("Hack"), sf::Vector2f(680, 250), sf::Vector2f(180, 60), 1.0f, "None", m_players, LIGHT);
-    m_naughtPlayerMenu = std::make_unique<Dropdownbox>(m_assets.getFont("Hack"), sf::Vector2f(890, 250), sf::Vector2f(180, 60), 1.0f, "None", m_players, LIGHT);
+    m_crossPlayerMenu = std::make_unique<Dropdownbox>(m_assets.getFont("Hack"), sf::Vector2f(680, 350), sf::Vector2f(180, 60), 1.0f, "None", m_players, LIGHT);
+    m_naughtPlayerMenu = std::make_unique<Dropdownbox>(m_assets.getFont("Hack"), sf::Vector2f(890, 350), sf::Vector2f(180, 60), 1.0f, "None", m_players, LIGHT);
 }
 
 void Game::run() {
@@ -84,15 +87,38 @@ void Game::update() {
     // GAME LOGIC
     if(m_gameEnded) { return; }
 
+    bool waitingForMove = false;
+    sf::Vector2i mousePos = sf::Mouse::getPosition(m_window) - m_boardPos;
     sf::Vector2u move = { m_size, m_size };
-    if(player == "Human") {
+
+    if (player == "Human") {
         move = humanMove();
-    }
-    else if(player == "Random") {
-        move = gameAi.randomMove(*m_board, m_size);
-    }
-    else if(player == "Greedy") {
-        move = gameAi.greedyMove(*m_board, m_size, m_currentPlayer);
+    } 
+    else if (player == "Random") {
+        if (m_turnCheckbox->isbuttonChecked() && !waitingForMove) {
+            waitingForMove = true;
+        }
+
+        if (waitingForMove && m_turnButton->buttonClicked(mousePos)) {
+            move = gameAi.randomMove(*m_board, m_size);
+            waitingForMove = false; 
+        } 
+        else if (!m_turnCheckbox->isbuttonChecked()) {
+            move = gameAi.randomMove(*m_board, m_size);
+        }
+    } 
+    else if (player == "Greedy") {
+        if (m_turnCheckbox->isbuttonChecked() && !waitingForMove) {
+            waitingForMove = true;
+        }
+
+        if (waitingForMove && m_turnButton->buttonClicked(mousePos)) {
+            move = gameAi.greedyMove(*m_board, m_size, m_currentPlayer);
+            waitingForMove = false;
+        } 
+        else if (!m_turnCheckbox->isbuttonChecked()) {
+            move = gameAi.greedyMove(*m_board, m_size, m_currentPlayer);
+        }
     }
 
     unsigned int row = move.x;
@@ -186,6 +212,9 @@ void Game::render() {
     }
 
     m_sizeSlider->draw(m_window);
+
+    m_turnCheckbox->draw(m_window);
+    m_turnButton->draw(m_window);
 
     m_naughtPlayerMenu->draw(m_window);
     m_crossPlayerMenu->draw(m_window);

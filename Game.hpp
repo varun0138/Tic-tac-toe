@@ -11,6 +11,8 @@
 #include "gui/Label.hpp"
 #include "gui/Slider.hpp"
 #include "gui/Dropdownbox.hpp"
+#include "gui/Button.hpp"
+#include "gui/Checkbox.hpp"
 
 class Game {
 private:
@@ -44,6 +46,9 @@ private:
 
     std::unique_ptr<Dropdownbox> m_crossPlayerMenu;
     std::unique_ptr<Dropdownbox> m_naughtPlayerMenu;
+
+    std::unique_ptr<Checkbox> m_turnCheckbox;
+    std::unique_ptr<Button> m_turnButton;
 
     void init();
     void renderSprite(const std::string& name, unsigned int x, unsigned int y);
