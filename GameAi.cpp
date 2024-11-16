@@ -53,8 +53,8 @@ sf::Vector2u GameAi::greedyMove(const Board& board, unsigned int size, State sta
     std::vector<State> line(size);
     std::vector<sf::Vector2u> lineCoords;
 
-    // Check rows
     for (unsigned int y = 0; y < size; ++y) {
+        // Check rows
         lineCoords.clear();
         bool lineClear = true;
         for (unsigned int x = 0; x < size; ++x) {
@@ -70,20 +70,18 @@ sf::Vector2u GameAi::greedyMove(const Board& board, unsigned int size, State sta
         if(lineClear && lineCoords.size() > 0) {
             return lineCoords[0];
         }
-    }
 
-    // Check columns
-    for (unsigned int x = 0; x < size; ++x) {
+        // check columns
         lineCoords.clear();
-        bool lineClear = true;
-        for (unsigned int y = 0; y < size; ++y) {
-            line[x] = board.getState(y, x);
+        lineClear = true;
+        for (unsigned int x = 0; x < size; ++x) {
+            line[x] = board.getState(x, y);
             if(line[x] == opponent) {
                 lineClear = false;
                 break;
             }
             if(line[x] == EMPTY) {
-                lineCoords.push_back({y, x});
+                lineCoords.push_back({x, y});
             }
         }
         if(lineClear && lineCoords.size() > 0) {
